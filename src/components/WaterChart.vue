@@ -47,7 +47,7 @@ export default {
         if (this.title !== '') {
           // value
           result[0] = {
-            label: `取樣值: ${this.title}`,
+            label: `取樣值`,
             data: [
               ...result[0].data,
               this.parseValue(item.data.value[this.title])
@@ -58,17 +58,22 @@ export default {
             ]
           }
           // spec
-          const spec = this.parseSpec(item.data.spec[this.title])
+          const spec_list = this.parseSpec(item.data.spec[this.title])
           // console.log(spec, this.title);
 
-          spec.forEach((spec, index) => {
-            console.log('spec', spec, this.title);
+          const fillstyle = spec_list.length === 2 ? [
+            '+1', '+1'
+          ]: [false, false]
+
+          spec_list.forEach((spec, index) => {
+            console.log('spec', spec_list, fillstyle);
             result[index+1] = {
-              label: `標準值: ${this.title}`,
+              label: `標準值`,
               data: [
                 ...result[index+1].data,
                 spec
               ],
+              fill: fillstyle[index],
               location: [
                 ...result[index+1].location,
                 item.data.value["備註"]

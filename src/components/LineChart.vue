@@ -40,7 +40,7 @@ export default {
         plugins: {
           title: {
             display: true,
-            text: 'Chart Title',
+            text: this.title,
           },
           tooltip: {
             callbacks: {
