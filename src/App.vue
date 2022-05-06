@@ -7,7 +7,7 @@ import WaterGraph from './components/WaterGraph.vue'
 
 <template>
   <!-- <img alt="Vue logo" src="./assets/logo.png" /> -->
-  <h1 style="text-align: center;">台南年度用戶端水質檢測資料</h1>
+  <h1 style="text-align: center;">台南年度用戶端水質檢測資料查詢</h1>
   <WaterGraph></WaterGraph>
 </template>
 
