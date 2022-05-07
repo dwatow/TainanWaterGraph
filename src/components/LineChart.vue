@@ -26,14 +26,22 @@ export default {
     },
   },
   mounted() {
-    const canvas = this.$refs.chart;
-    canvas.height = 200;
-    this.chart = new Chart(canvas.getContext('2d'), {
+    this.chart = this.initChart({
+      labels: this.xAxisLabel,
+      datasets: this.datasets,
+    })
+  },
+  data() {
+    return {
+      chart: null
+    }
+  },
+  methods: {
+    initChart(data) {
+      const canvas = this.$refs.chart;
+      return new Chart(canvas.getContext('2d'), {
       type: 'line',
-      data: {
-        labels: this.xAxisLabel,
-        datasets: this.datasets
-      },
+      data,
       options: {
         responsive: true,
         maintainAspectRatio: false,
@@ -41,6 +49,7 @@ export default {
           title: {
             display: true,
             text: this.title,
+            fullSize: true,
           },
           tooltip: {
             callbacks: {
@@ -50,17 +59,32 @@ export default {
         }
       }
     })
-  },
-  data() {
-    return {
-      chart: null
-    }
-  },
-  methods: {
+    },
     radom(max){
       return Math.floor(Math.random()*max);
     }
   },
+  // updated() {
+  //   console.log('update');
+  //   this.chart.afterDestroy()
+  //   this.chart = this.initChart({
+  //     labels: this.xAxisLabel,
+  //     datasets: this.datasets,
+  //   })
+    // this.chart.update(); 
+  // },
+  beforeDestroy() {
+    this.chart.destroy()
+  },
+  // watch: {
+  //   items(value) {
+  //     console.log('watch items', this.chart);
+  //     setTimeout(() => {
+  //       this.chart.data.datasets = this.datasets;
+  //       this.chart.update()
+  //     }, 100)
+  //   }
+  // },
   computed: {
     datasets() {
       return this.items

@@ -17,23 +17,25 @@
       </a-col>
       <a-col :span="6">
         <a-form-item>
-          <a-button type="primary" html-type="submit">查詢</a-button>
+          <a-button :disabled="status !== ''" type="primary" html-type="submit">查詢</a-button>
         </a-form-item>
       </a-col>
     </a-row>
   </a-form>
-  <WaterChart v-if="message.length" title="濁度(NTU)" :message="message"></WaterChart>
-  <WaterChart v-if="message.length" title="色度(鉑鈷單位)" :message="message"></WaterChart>
-  <WaterChart v-if="message.length" title="臭度(初嗅數)" :message="message"></WaterChart>
-  <WaterChart v-if="message.length" title="pH值" :message="message"></WaterChart>
-  <WaterChart v-if="message.length" title="自由有效餘氯mg/L" :message="message"></WaterChart>
-  <WaterChart v-if="message.length" title="大腸桿菌群(CFU/100毫升)" :message="message"></WaterChart>
-  <WaterChart v-if="message.length" title="總菌落數(CFU/毫升)" :message="message"></WaterChart>
-  <WaterChart v-if="message.length" title="水溫(℃)" :message="message"></WaterChart>
-  <div v-else style="text-align: center;">{{ status }}</div>
-  <!-- <div>-------------------------</div>
-  <pre>{{ message }}</pre>
-  <div>-------------------------</div> -->
+  <div style="text-align: center;">
+    <div>{{ status }}</div>
+    <div>已收到資料數量: {{ items.length }}</div>
+    <div>已收到的請求: {{ fetchCount }}</div>
+  </div>
+  
+  <WaterChart v-if="message.length" title="濁度(NTU)" :message="items.slice()"></WaterChart>
+  <WaterChart v-if="message.length" title="色度(鉑鈷單位)" :message="items.slice()"></WaterChart>
+  <WaterChart v-if="message.length" title="臭度(初嗅數)" :message="items.slice()"></WaterChart>
+  <WaterChart v-if="message.length" title="pH值" :message="items.slice()"></WaterChart>
+  <WaterChart v-if="message.length" title="自由有效餘氯mg/L" :message="items.slice()"></WaterChart>
+  <WaterChart v-if="message.length" title="大腸桿菌群(CFU/100毫升)" :message="items.slice()"></WaterChart>
+  <WaterChart v-if="message.length" title="總菌落數(CFU/毫升)" :message="items.slice()"></WaterChart>
+  <WaterChart v-if="message.length" title="水溫(℃)" :message="items.slice()"></WaterChart>
 </template>
 
 <script>
@@ -48,6 +50,7 @@ export default {
   data() {
     return {
       status: '',
+      fetchCount: 0,
       message: [],
       SearchKeyword: "仁德",
       SampleYear: 2021,
@@ -55,28 +58,49 @@ export default {
   },
   methods: {
     onSubmit() {
+      this.message = [];
+      this.fetchCount = 0;
       this.fetchWaterQuality({
         SearchKeyword: this.SearchKeyword,
         SampleYear: this.SampleYear,
       });
     },
+    parseDate(title) {
+      const dateTainanFormat = title.split('|').pop().trim()
+      const [year, ...monthAndDay] = dateTainanFormat.split('年')
+      const [month, ...dayText] = monthAndDay.join().split('月')
+      const [day, ...other] = dayText.join().split('日')
+      return [year, month, day]
+    },
     async fetchWaterQuality({ SearchKeyword, SampleYear }) {
       this.status = '查詢中...'
-      await Promise.all(
-        Array(12)
-          .fill(1)
-          .map((o, i) => o + i)
-          .map(async (SampleMonth) => {
+      Array(12)
+        .fill(1)
+        .map((o, i) => o + i)
+        .forEach(async (SampleMonth) => {
+          // await new Promise(res => setTimeout(() => res(), 500))
+          try {
             const res = await backendAPI.promiseGET("/water-quality", {
               SearchKeyword,
               SampleYear,
               SampleMonth,
             });
-            this.status = ''
-            this.message = [...this.message, ...res.data];
-          })
-      );
+            this.message = [...this.message, ...res.data]
+          } finally {
+            this.fetchCount += 1;
+            if (this.fetchCount === 12) this.status = ''
+          }
+        })
+      
     },
+  },
+  computed: {
+    items() {
+      return this.message.sort((a, b) => {
+        return new Date(this.parseDate(a.title)) - new Date(this.parseDate(b.title))
+      })
+
+    }
   },
   // computed: {
   //   message() {

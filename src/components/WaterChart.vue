@@ -1,10 +1,11 @@
 <template>
-  <LineChart v-if="message.length" :title="title" :items="items" :xAxisLabel="xAxisLabel"></LineChart>
+  <LineChart v-if="status" :title="title" :items="items" :xAxisLabel="xAxisLabel"></LineChart>
   <!-- <div v-for="item in items">{{ item.data }}</div> -->
 </template>
 
 <script>
 import LineChart from "./LineChart.vue";
+
 export default {
   name: 'WaterChart',
   components: {
@@ -19,6 +20,29 @@ export default {
       type: Array,
       required: true
     },
+  },
+  data() {
+    return {
+      status: false
+    }
+  },
+  mounted() {
+    this.$nextTick(() => {
+      this.status = true;
+      // console.log('this.status', this.status);
+    })
+  },
+  watch: {
+    message() {
+      this.status = false;
+      // console.log('this.status', this.status);
+    }
+  },
+  updated() {
+    this.$nextTick(() => {
+      this.status = true;
+      // console.log('this.status', this.status);
+    })
   },
   methods: {
     parseValue(value) {
@@ -43,7 +67,8 @@ export default {
       }, new Set()).values()]
     },
     items() {
-      return this.message.reduce((result, item) => {
+      return this.message
+      .reduce((result, item) => {
         if (this.title !== '') {
           // value
           result[0] = {
@@ -66,7 +91,7 @@ export default {
           ]: [false, false]
 
           spec_list.forEach((spec, index) => {
-            console.log('spec', spec_list, fillstyle);
+            // console.log('spec', spec_list, fillstyle);
             result[index+1] = {
               label: `標準值`,
               data: [

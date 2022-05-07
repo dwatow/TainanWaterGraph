@@ -11,11 +11,11 @@ app.use(Antd);
 
 app.config.errorHandler = (err) => {
     /* handle error */
-    console.error('handle error')
+    console.error('handle error', err)
 }
 app.config.warnHandler = (err) => {
     /* handle warn */
-    console.warn('handle warn')
+    console.warn('handle warn', err)
 }
 app.mount('#app')
 
