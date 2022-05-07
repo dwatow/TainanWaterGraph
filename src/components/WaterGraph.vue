@@ -3,7 +3,7 @@
   <!-- <pre>{{ SampleYear }}</pre> -->
   <!-- <pre>{{ SearchKeyword }}</pre> -->
   
-  <a-form @submit="onSubmit" style="max-width: 500px; margin: auto">
+  <a-form @submit="onSubmit" style="width: fit-content; margin: auto">
     <a-space align="end">
         <a-form-item label="年份" name="Year">
           <a-input-number v-model:value="SampleYear" />
@@ -22,9 +22,9 @@
     <!-- <p>{{ months }}</p> -->
     <p class="months">
       <div v-for="(value, key) in months">
-        <div>{{ key }}</div>
+        <div>{{ key }} 月</div>
         <div>
-          <div v-if="value == null" style="background-color: rgba(255, 206, 86, 1);">{{ status }}</div>
+          <div v-if="value == null" style="background-color: rgba(255, 206, 86, 1);">查詢中...</div>
           <div v-else-if="value < 0" style="background-color: rgba(255, 99, 132, 1);">{{ value }}</div>
           <div v-else style="background-color: rgba(75, 192, 192, 1);">{{ value }}</div>
         </div>
@@ -32,11 +32,11 @@
           v-if="value != null"
           :disabled="value >= 0"
           type="text"
-          @click="fetchWaterQualityMonth({
+          @click="fetchWaterQualityMonth(
             SearchKeyword,
             SampleYear,
             key
-          })"><SearchOutlined /></a-button>
+          )"><SearchOutlined /></a-button>
       </div>
     </p>
     <!-- <div>已收到資料數量: {{ items.length }}</div>
@@ -67,7 +67,7 @@ export default {
   created() {
     this.months = Array(12).fill(1).map((o, i) => o + i)
       .reduce((result, item) => {
-        result[`${item} 月`] = null;
+        result[`${item}`] = null;
         return result
       }, {})
   },
@@ -87,7 +87,7 @@ export default {
       this.fetchCount = 0;
       this.months = Array(12).fill(1).map((o, i) => o + i)
         .reduce((result, item) => {
-          result[`${item} 月`] = null;
+          result[item] = null;
           return result
         }, {})
       this.fetchWaterQuality({
@@ -103,7 +103,8 @@ export default {
       return [year, month, day]
     },
     async fetchWaterQualityMonth(SearchKeyword, SampleYear, SampleMonth) {
-      this.months[`${SampleMonth} 月`] = null
+      console.log(SearchKeyword, SampleYear, SampleMonth);
+      this.months[SampleMonth] = null
       try {
         const res = await backendAPI.GET("/water-quality", {
           SearchKeyword,
@@ -111,10 +112,10 @@ export default {
           SampleMonth,
         });
         this.message = [...this.message, ...res.data]
-        this.months[`${SampleMonth} 月`] = res.data.length; // success
+        this.months[SampleMonth] = res.data.length; // success
       } catch(e) {
         console.log(e);
-        this.months[`${SampleMonth} 月`] = -1; // false
+        this.months[SampleMonth] = -1; // false
       } finally {
         this.fetchCount += 1;
         if (this.fetchCount === 12) this.status = ''
