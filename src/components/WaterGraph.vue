@@ -111,7 +111,7 @@ export default {
       return [year, month, day]
     },
     async fetchWaterQualityMonth(SearchKeyword, SampleYear, SampleMonth) {
-      console.log(SearchKeyword, SampleYear, SampleMonth);
+      // console.log(SearchKeyword, SampleYear, SampleMonth);
       this.status = '查詢中...'
       this.fetchCount -= 1;
       this.months[SampleMonth] = null
