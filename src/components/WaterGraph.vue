@@ -24,7 +24,7 @@
       <div v-for="(value, key) in months">
         <div>{{ key }} 月</div>
         <div>
-          <div v-if="value == null" style="background-color: rgba(255, 206, 86, 1);">查詢中...</div>
+          <div v-if="value == null" style="background-color: rgba(255, 206, 86, 1);">{{ status }}</div>
           <div v-else-if="value < 0" style="background-color: rgba(255, 99, 132, 1);">{{ value }}</div>
           <div v-else style="background-color: rgba(75, 192, 192, 1);">{{ value }}</div>
         </div>
