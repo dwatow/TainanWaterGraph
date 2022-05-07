@@ -1,5 +1,5 @@
 <template>
-  <!-- <div>24242 {{ message }}</div> -->
+  <!-- <div>fetchCount: {{ fetchCount }}</div> -->
   <!-- <pre>{{ SampleYear }}</pre> -->
   <!-- <pre>{{ SearchKeyword }}</pre> -->
   
@@ -12,7 +12,7 @@
           <a-input v-model:value="SearchKeyword" />
         </a-form-item>
         <a-form-item>
-          <a-button :disabled="status !== ''" type="primary" html-type="submit">
+          <a-button :disabled="fetchCount !== 12" type="primary" html-type="submit">
             <SearchOutlined></SearchOutlined>
           </a-button>
         </a-form-item>
@@ -82,7 +82,7 @@ export default {
   data() {
     return {
       status: '',
-      fetchCount: 0,
+      fetchCount: 12,
       message: [],
       months: {},
       SearchKeyword: "仁德",
@@ -92,7 +92,7 @@ export default {
   methods: {
     onSubmit() {
       this.message = [];
-      this.fetchCount = 0;
+      this.fetchCount = 12;
       this.months = Array(12).fill(1).map((o, i) => o + i)
         .reduce((result, item) => {
           result[item] = null;
@@ -112,6 +112,8 @@ export default {
     },
     async fetchWaterQualityMonth(SearchKeyword, SampleYear, SampleMonth) {
       console.log(SearchKeyword, SampleYear, SampleMonth);
+      this.status = '查詢中...'
+      this.fetchCount -= 1;
       this.months[SampleMonth] = null
       try {
         const res = await backendAPI.GET("/water-quality", {
@@ -131,7 +133,6 @@ export default {
 
     },
     async fetchWaterQuality({ SearchKeyword, SampleYear }) {
-      this.status = '查詢中...'
       Array(12)
         .fill(1)
         .map((o, i) => o + i)
