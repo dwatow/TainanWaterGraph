@@ -9,16 +9,16 @@ export default {
     return backendAPI.get(url, {
       params
     })
-  },
-  async promiseGET(url, params) {
-    try {
-      return await backendAPI.get(url, {
-        params
-      })
-    } catch (error) {
-      return await backendAPI.get(url, {
-        params
-      })
-    }
+  // },
+  // async promiseGET(url, params) {
+  //   try {
+  //     return await backendAPI.get(url, {
+  //       params
+  //     })
+  //   } catch (error) {
+  //     return await backendAPI.get(url, {
+  //       params
+  //     })
+  //   }
   }
 }

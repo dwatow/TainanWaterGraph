@@ -3,29 +3,44 @@
   <!-- <pre>{{ SampleYear }}</pre> -->
   <!-- <pre>{{ SearchKeyword }}</pre> -->
   
-  <a-form @submit="onSubmit" style="width: 500px; margin: auto">
-    <a-row :gutter="16">
-      <a-col :span="7">
+  <a-form @submit="onSubmit" style="max-width: 500px; margin: auto">
+    <a-space align="end">
         <a-form-item label="年份" name="Year">
           <a-input-number v-model:value="SampleYear" />
         </a-form-item>
-      </a-col>
-      <a-col :span="11">
         <a-form-item label="地區" name="Keyword">
           <a-input v-model:value="SearchKeyword" />
         </a-form-item>
-      </a-col>
-      <a-col :span="6">
         <a-form-item>
-          <a-button :disabled="status !== ''" type="primary" html-type="submit">查詢</a-button>
+          <a-button :disabled="status !== ''" type="primary" html-type="submit">
+            <SearchOutlined></SearchOutlined>
+          </a-button>
         </a-form-item>
-      </a-col>
-    </a-row>
+    </a-space>
   </a-form>
   <div style="text-align: center;">
-    <div>{{ status }}</div>
-    <div>已收到資料數量: {{ items.length }}</div>
-    <div>已收到的請求: {{ fetchCount }}</div>
+    <!-- <p>{{ months }}</p> -->
+    <p class="months">
+      <div v-for="(value, key) in months">
+        <div>{{ key }}</div>
+        <div>
+          <div v-if="value == null" style="background-color: rgba(255, 206, 86, 1);">{{ status }}</div>
+          <div v-else-if="value < 0" style="background-color: rgba(255, 99, 132, 1);">{{ value }}</div>
+          <div v-else style="background-color: rgba(75, 192, 192, 1);">{{ value }}</div>
+        </div>
+        <a-button
+          v-if="value != null"
+          :disabled="value >= 0"
+          type="text"
+          @click="fetchWaterQualityMonth({
+            SearchKeyword,
+            SampleYear,
+            key
+          })"><SearchOutlined /></a-button>
+      </div>
+    </p>
+    <!-- <div>已收到資料數量: {{ items.length }}</div>
+    <div>已收到的請求: {{ fetchCount }}</div> -->
   </div>
   
   <WaterChart v-if="message.length" title="濁度(NTU)" :message="items.slice()"></WaterChart>
@@ -41,17 +56,27 @@
 <script>
 import backendAPI from "./../utility/backendAPI";
 import WaterChart from "./WaterChart.vue";
+import { SearchOutlined } from '@ant-design/icons-vue';
 
 export default {
   name: "WaterGraph",
   components: {
     WaterChart,
+    SearchOutlined
+  },
+  created() {
+    this.months = Array(12).fill(1).map((o, i) => o + i)
+      .reduce((result, item) => {
+        result[`${item} 月`] = null;
+        return result
+      }, {})
   },
   data() {
     return {
       status: '',
       fetchCount: 0,
       message: [],
+      months: {},
       SearchKeyword: "仁德",
       SampleYear: 2021,
     };
@@ -60,6 +85,11 @@ export default {
     onSubmit() {
       this.message = [];
       this.fetchCount = 0;
+      this.months = Array(12).fill(1).map((o, i) => o + i)
+        .reduce((result, item) => {
+          result[`${item} 月`] = null;
+          return result
+        }, {})
       this.fetchWaterQuality({
         SearchKeyword: this.SearchKeyword,
         SampleYear: this.SampleYear,
@@ -72,6 +102,25 @@ export default {
       const [day, ...other] = dayText.join().split('日')
       return [year, month, day]
     },
+    async fetchWaterQualityMonth(SearchKeyword, SampleYear, SampleMonth) {
+      this.months[`${SampleMonth} 月`] = null
+      try {
+        const res = await backendAPI.GET("/water-quality", {
+          SearchKeyword,
+          SampleYear,
+          SampleMonth,
+        });
+        this.message = [...this.message, ...res.data]
+        this.months[`${SampleMonth} 月`] = res.data.length; // success
+      } catch(e) {
+        console.log(e);
+        this.months[`${SampleMonth} 月`] = -1; // false
+      } finally {
+        this.fetchCount += 1;
+        if (this.fetchCount === 12) this.status = ''
+      }
+
+    },
     async fetchWaterQuality({ SearchKeyword, SampleYear }) {
       this.status = '查詢中...'
       Array(12)
@@ -79,17 +128,7 @@ export default {
         .map((o, i) => o + i)
         .forEach(async (SampleMonth) => {
           // await new Promise(res => setTimeout(() => res(), 500))
-          try {
-            const res = await backendAPI.promiseGET("/water-quality", {
-              SearchKeyword,
-              SampleYear,
-              SampleMonth,
-            });
-            this.message = [...this.message, ...res.data]
-          } finally {
-            this.fetchCount += 1;
-            if (this.fetchCount === 12) this.status = ''
-          }
+          await this.fetchWaterQualityMonth(SearchKeyword, SampleYear, SampleMonth)
         })
       
     },
@@ -547,4 +586,11 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.months {
+  display: flex;
+  flex-wrap: nowrap;
+  * {
+    flex: 1 1 auto;
+  }
+}
 </style>
