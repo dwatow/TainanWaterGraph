@@ -36,7 +36,8 @@
             SearchKeyword,
             SampleYear,
             key
-          )"><SearchOutlined /></a-button>
+          )"><SearchOutlined />
+        </a-button>
       </div>
     </p>
     <!-- <div>已收到資料數量: {{ items.length }}</div>
@@ -51,18 +52,25 @@
   <WaterChart v-if="message.length" title="大腸桿菌群(CFU/100毫升)" :message="items.slice()"></WaterChart>
   <WaterChart v-if="message.length" title="總菌落數(CFU/毫升)" :message="items.slice()"></WaterChart>
   <WaterChart v-if="message.length" title="水溫(℃)" :message="items.slice()"></WaterChart>
+  
+  <footer>
+    <a-button type="text" href="https://github.com/dwatow/TainanWaterGraph" target="_blank">
+      <GithubOutlined /> to Github repo
+    </a-button>
+  </footer>
 </template>
 
 <script>
 import backendAPI from "./../utility/backendAPI";
 import WaterChart from "./WaterChart.vue";
-import { SearchOutlined } from '@ant-design/icons-vue';
+import { SearchOutlined, GithubOutlined } from '@ant-design/icons-vue';
 
 export default {
   name: "WaterGraph",
   components: {
     WaterChart,
-    SearchOutlined
+    SearchOutlined,
+    GithubOutlined
   },
   created() {
     this.months = Array(12).fill(1).map((o, i) => o + i)
@@ -593,5 +601,9 @@ export default {
   * {
     flex: 1 1 auto;
   }
+}
+
+footer {
+  text-align: center;
 }
 </style>
