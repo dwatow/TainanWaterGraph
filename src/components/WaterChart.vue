@@ -61,10 +61,11 @@ export default {
   },
   computed: {
     xAxisLabel() {
-      return [...this.message.reduce((result, item) => {
-        result.add(item.title)
-        return result
-      }, new Set()).values()]
+      return this.message.map(item => item.title)
+      // return [...this.message.reduce((result, item) => {
+      //   result.add(item.title)
+      //   return result
+      // }, new Set()).values()]
     },
     items() {
       return this.message
