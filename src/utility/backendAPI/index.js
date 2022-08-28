@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const backendAPI = axios.create({
-  baseURL: 'https://my-god.herokuapp.com'
+  baseURL: 'https://my-god-render.onrender.com'
 })
 
 export default {
